@@ -1,0 +1,7 @@
+{
+  "name": "Statify",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
