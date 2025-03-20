@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>📊 Statistiques Spotify</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goToHome()">🏠 Accueil</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>🏆 Top 10 Artistes</h2>
+  <ion-list>
+    <ion-item *ngFor="let artist of topArtists">
+      <ion-thumbnail slot="start">
+        <img [src]="artist.images[0]?.url" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ artist.name }}</h2>
+        <p>Popularité : {{ artist.popularity }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <h2>🎶 Top 10 Musiques</h2>
+  <ion-list>
+    <ion-item *ngFor="let track of topTracks">
+      <ion-thumbnail slot="start">
+        <img [src]="track.album.images[0]?.url" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ track.name }}</h2>
+        <p>{{ track.artists[0]?.name }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
