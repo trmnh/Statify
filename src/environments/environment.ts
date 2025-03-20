@@ -3,8 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  spotifyClientId: '75b8c3045ffd4e978b2f0d3b907d81e8',
+  spotifyRedirectUri: 'http://localhost:8100/' // Mets ton URI de redirection
 };
+
 
 /*
  * For easier debugging in development mode, you can import the following file
