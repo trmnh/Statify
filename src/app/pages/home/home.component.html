@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Accueil</ion-title>
+    <ion-title>Statify</ion-title>
     <ion-buttons slot="end">
       <ion-button color="danger" (click)="logout()">Déconnexion</ion-button>
     </ion-buttons>
@@ -8,25 +8,44 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <h2>Bienvenue sur Statify !</h2>
-  <ion-button expand="full" (click)="goToStats()">📊 Voir mes stats</ion-button>
-  <p>Recherchez une musique sur Spotify :</p>
+  <h2>Bienvenue sur Statify</h2>
+  <ion-button expand="full" (click)="goToStats()">Voir mes stats</ion-button>
+  <ion-button
+    expand="block"
+    color="primary"
+    (click)="generateTopTracksPlaylist()"
+  >
+    Générer ma playlist test top titres
+  </ion-button>
 
-  <ion-searchbar (ionInput)="search($event.detail.value || '')"></ion-searchbar>
+  <ion-button
+    expand="full"
+    color="success"
+    (click)="
+      playTrack('spotify:track:2nLtzopw4rPReszdYBJU6h?si=ee807d4b83d548ac')
+    "
+  >
+    Lancer "Numb de Linkin Park" (test)
+  </ion-button>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Vos playlists</ion-card-title>
+    </ion-card-header>
 
-  <ion-list>
-    <ion-item *ngFor="let track of tracks">
-      <ion-thumbnail slot="start">
-        <img [src]="track.album.images[0]?.url" />
-      </ion-thumbnail>
-      <ion-label>
-        <h2>{{ track.name }}</h2>
-        <p>{{ track.artists[0]?.name }}</p>
-      </ion-label>
-      <ion-button *ngIf="track.preview_url" (click)="playPreview(track.preview_url)">
-        ▶️
-      </ion-button>
+    <ion-card-content>
+      @for (playlist of userPlaylists(); track $index) {
+      <ion-item button (click)="openPlaylist(playlist.external_urls.spotify)">
+        <ion-thumbnail slot="start">
+          <img [src]="playlist.images[0]?.url" alt="Pochette" />
+        </ion-thumbnail>
+        <ion-label>
+          <h2>{{ playlist.name }}</h2>
+          <p>{{ playlist.tracks.total }} titres</p>
+        </ion-label>
+      </ion-item>
+      }
+    </ion-card-content>
+  </ion-card>
 
-    </ion-item>
-  </ion-list>
+  <app-player></app-player>
 </ion-content>

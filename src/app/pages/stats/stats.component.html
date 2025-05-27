@@ -1,36 +1,53 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>📊 Statistiques Spotify</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="goToHome()">🏠 Accueil</ion-button>
-    </ion-buttons>
+    <ion-title>Statistiques</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <h2>🏆 Top 10 Artistes</h2>
+  @if (userProfile()) {
+  <div>
+    <h2>{{ userProfile().display_name }}</h2>
+    @if (userProfile().images?.length > 0) {
+    <img
+      [src]="userProfile().images[0]?.url"
+      alt="Avatar utilisateur"
+      style="width: 100px; border-radius: 50%"
+    />
+    }
+  </div>
+  }
+
+  <h3>Top 10 artistes</h3>
   <ion-list>
-    <ion-item *ngFor="let artist of topArtists">
+    @for (artist of topArtists(); track $index) {
+    <ion-item>
+      @if (artist.images?.length > 0) {
       <ion-thumbnail slot="start">
-        <img [src]="artist.images[0]?.url" />
+        <img [src]="artist.images[0].url" alt="Image artiste" />
       </ion-thumbnail>
-      <ion-label>
-        <h2>{{ artist.name }}</h2>
-        <p>Popularité : {{ artist.popularity }}</p>
-      </ion-label>
+      }
+      <ion-label>{{ artist.name }}</ion-label>
     </ion-item>
+    }
   </ion-list>
 
-  <h2>🎶 Top 10 Musiques</h2>
+  <h3>Top 10 titres</h3>
   <ion-list>
-    <ion-item *ngFor="let track of topTracks">
+    @for (track of topTracks(); track $index) {
+    <ion-item>
+      @if (track.album?.images?.length > 0) {
       <ion-thumbnail slot="start">
-        <img [src]="track.album.images[0]?.url" />
+        <img [src]="track.album.images[0].url" alt="Image album" />
       </ion-thumbnail>
+      }
       <ion-label>
-        <h2>{{ track.name }}</h2>
-        <p>{{ track.artists[0]?.name }}</p>
+        <div>{{ track.name }}</div>
+        <small>{{ getArtistNames(track) }}</small>
       </ion-label>
     </ion-item>
+    }
   </ion-list>
+
+  <ion-button expand="full" (click)="goToHome()">Retour à l'accueil</ion-button>
 </ion-content>

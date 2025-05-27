@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SpotifyService } from '../../services/spotify.service';
 import { IonicModule } from '@ionic/angular';
@@ -11,30 +11,43 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./stats.component.scss'],
   imports: [IonicModule, CommonModule],
 })
-export class StatsComponent {
-  topArtists: any[] = [];
-  topTracks: any[] = [];
+export class StatsComponent implements OnInit {
+  userProfile = signal<any | null>(null);
+  topArtists = signal<any[]>([]);
+  topTracks = signal<any[]>([]);
 
-  constructor(private router: Router, private spotifyService: SpotifyService) {
-    this.checkAuthentication();
+  private spotifyService = inject(SpotifyService);
+  private router = inject(Router);
+
+  ngOnInit() {
+    if (!this.spotifyService.isTokenValid()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.loadStats();
   }
 
-  checkAuthentication() {
-    const token = localStorage.getItem("spotifyToken");
-    if (!token) {
-      this.router.navigate(['/']); // Redirige vers login si non connecté
+  async loadStats() {
+    try {
+      const profile = await this.spotifyService.getUserProfile();
+      const artists = await this.spotifyService.getTopArtists();
+      const tracks = await this.spotifyService.getTopTracks();
+
+      this.userProfile.set(profile);
+      this.topArtists.set(artists);
+      this.topTracks.set(tracks);
+    } catch (error) {
+      console.error('Erreur API Spotify', error);
+      this.router.navigate(['/login']);
     }
   }
 
-  async loadStats() {
-    console.log("📊 Chargement des statistiques...");
-    this.topArtists = await this.spotifyService.getTopArtists();
-    this.topTracks = await this.spotifyService.getTopTracks();
+  getArtistNames(track: any): string {
+    return track.artists.map((a: any) => a.name).join(', ');
   }
 
   goToHome() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/tabs/home']);
   }
 }
-

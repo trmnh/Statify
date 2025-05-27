@@ -34,4 +34,27 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+@media screen and (min-width: 768px) {
+  app-root {
+    display: none;
+  }
+
+  body::before {
+    content: "Statify est uniquement disponible sur mobile pour le moment.";
+    display: block;
+    padding: 2rem;
+    font-size: 1.2rem;
+    text-align: center;
+    color: #fff;
+    background-color: #000;
+    height: 100vh;
+  }
+}
+
+ion-content {
+  pointer-events: auto !important;
+  z-index: 1;
+  position: relative;
+}

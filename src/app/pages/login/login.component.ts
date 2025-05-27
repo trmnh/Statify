@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -12,32 +11,50 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, CommonModule],
 })
 export class LoginComponent {
-  constructor(private router: Router) {
+  constructor() {
     this.checkForToken();
   }
 
   login() {
-    const authUrl = `https://accounts.spotify.com/authorize` +
+    const redirectUri = 'http://localhost:4200/login';
+
+    const scopes = [
+      'user-read-private',
+      'user-read-email',
+      'user-read-playback-state',
+      'user-modify-playback-state',
+      'user-library-read',
+      'playlist-modify-private',
+      'playlist-modify-public',
+      'user-top-read',
+      'streaming',
+      'user-read-recently-played',
+    ].join('%20');
+
+    const authUrl =
+      `https://accounts.spotify.com/authorize` +
       `?client_id=${environment.spotifyClientId}` +
       `&response_type=token` +
-      `&redirect_uri=${encodeURIComponent(environment.spotifyRedirectUri)}` +
-      `&scope=user-library-read%20user-top-read%20user-read-private`;
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&scope=${scopes}`;
 
+    console.log('Redirection vers Spotify :', authUrl);
     window.location.href = authUrl;
   }
 
   checkForToken() {
     const hash = window.location.hash;
-    console.log("URL après redirection :", hash); // 🔍 Vérifie ce qui est dans l’URL après connexion
+    console.log('checkForToken hash :', hash);
 
-    if (hash.includes("access_token")) {
-      const token = new URLSearchParams(hash.substring(1)).get("access_token");
+    if (hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const token = params.get('access_token');
 
       if (token) {
-        console.log("Token récupéré :", token); // 🔍 Vérifie que le token est bien extrait
-        localStorage.setItem("spotifyToken", token);
-        window.history.replaceState({}, document.title, "/home"); // Enlève le token de l’URL
-        this.router.navigate(['/home']); // Redirige vers la page d'accueil
+        console.log('Token trouvé :', token);
+        localStorage.setItem('spotifyToken', token);
+
+        window.location.replace('/tabs/home');
       }
     }
   }

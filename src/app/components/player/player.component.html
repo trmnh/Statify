@@ -1,0 +1,50 @@
+@if (trackName) {
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>{{ trackName }}</ion-card-title>
+    <ion-card-subtitle>{{ artistName }}</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content class="ion-text-center">
+    @if (albumImage) {
+    <img
+      [src]="albumImage"
+      alt="Pochette"
+      style="max-width: 200px; border-radius: 10px"
+    />
+    }
+
+    <ion-button
+      shape="round"
+      fill="clear"
+      size="large"
+      color="dark"
+      (click)="togglePlayback()"
+    >
+      <ion-icon
+        [name]="isPlaying ? 'pause-circle' : 'play-circle'"
+        size="large"
+      ></ion-icon>
+    </ion-button>
+
+    <div style="margin-top: 10px">
+      {{ formatTime(currentPosition) }} /
+      {{ formatTime(duration) }}
+    </div>
+
+    <ion-range
+      [value]="(currentPosition / duration) * 100"
+      min="0"
+      max="100"
+      [disabled]="duration === 0"
+      (ionChange)="onSeek($event)"
+    ></ion-range>
+  </ion-card-content>
+</ion-card>
+} @else {
+<ion-card>
+  <ion-card-content class="ion-text-center">
+    <p>Aucune lecture en cours</p>
+  </ion-card-content>
+</ion-card>
+}
