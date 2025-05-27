@@ -1,0 +1,19 @@
+<ion-router-outlet></ion-router-outlet>
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="home" [routerLink]="['/tabs/home']">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>Accueil</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="search" [routerLink]="['/tabs/search']">
+      <ion-icon name="search-outline"></ion-icon>
+      <ion-label>Recherche</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="stats" [routerLink]="['/tabs/stats']">
+      <ion-icon name="stats-chart-outline"></ion-icon>
+      <ion-label>Stats</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
