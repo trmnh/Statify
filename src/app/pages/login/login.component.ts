@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,7 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, CommonModule],
 })
 export class LoginComponent {
-  constructor() {
+  constructor(private router: Router) {
     this.checkForToken();
   }
 
@@ -49,12 +50,18 @@ export class LoginComponent {
     if (hash.includes('access_token')) {
       const params = new URLSearchParams(hash.substring(1));
       const token = params.get('access_token');
+      const expiresIn = params.get('expires_in');
 
-      if (token) {
+      if (token && expiresIn) {
         console.log('Token trouvé :', token);
         localStorage.setItem('spotifyToken', token);
+        
+      
+        const expiryTime = Date.now() + (parseInt(expiresIn) * 1000);
+        localStorage.setItem('tokenExpiry', expiryTime.toString());
 
-        window.location.replace('/tabs/home');
+       
+        this.router.navigate(['/tabs/home']);
       }
     }
   }

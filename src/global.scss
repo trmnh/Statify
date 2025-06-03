@@ -57,4 +57,96 @@ ion-content {
   pointer-events: auto !important;
   z-index: 1;
   position: relative;
+  --background: var(--ion-color-dark);
+}
+
+ion-toolbar {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-light);
+}
+
+ion-item {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-light);
+  --border-color: var(--ion-color-tertiary);
+  margin: 8px 0;
+  border-radius: 8px;
+}
+
+ion-card {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-light);
+  border-radius: 12px;
+  margin: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+ion-button {
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary-shade);
+  --color: var(--ion-color-light);
+  --border-radius: 24px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+ion-segment {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-tertiary);
+  --color-checked: var(--ion-color-primary);
+}
+
+ion-segment-button {
+  --color: var(--ion-color-tertiary);
+  --color-checked: var(--ion-color-primary);
+  --indicator-color: var(--ion-color-primary);
+}
+
+/* Styles pour les listes */
+ion-list {
+  background: transparent;
+  padding: 8px;
+}
+
+/* Styles pour les titres */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ion-color-light);
+  font-weight: 600;
+}
+
+/* Styles pour les paragraphes */
+p {
+  color: var(--ion-color-tertiary);
+}
+
+/* Styles pour les badges */
+ion-badge {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-light);
+  border-radius: 12px;
+  padding: 4px 8px;
+}
+
+/* Styles pour les inputs */
+ion-input, ion-textarea {
+  --background: var(--ion-color-secondary);
+  --color: var(--ion-color-light);
+  --placeholder-color: var(--ion-color-tertiary);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+/* Styles pour les icônes */
+ion-icon {
+  color: var(--ion-color-light);
+}
+
+/* Styles pour les boutons de la barre d'outils */
+ion-buttons {
+  ion-button {
+    --background: transparent;
+    --color: var(--ion-color-light);
+  }
 }

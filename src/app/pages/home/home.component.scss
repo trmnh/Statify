@@ -1,0 +1,16 @@
+.profile-item {
+  --background: transparent;
+  --color: var(--ion-color-light);
+  margin-right: 8px;
+  
+  ion-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+
+  ion-label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}

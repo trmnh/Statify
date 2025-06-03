@@ -1,53 +1,94 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
-import { SpotifyService } from '../../services/spotify.service';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { SpotifyService } from '../../services/spotify.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+interface SearchResult {
+  id: string;
+  name: string;
+  uri: string;
+  images?: Array<{ url: string }>;
+  artists?: Array<{ name: string }>;
+  album?: {
+    name: string;
+    images: Array<{ url: string }>;
+  };
+}
 
 @Component({
   selector: 'app-search',
   standalone: true,
   templateUrl: './search.component.html',
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [CommonModule, IonicModule, ReactiveFormsModule],
 })
 export class SearchComponent implements OnInit {
-  private spotifyService = inject(SpotifyService);
-  private router = inject(Router);
+  searchForm: FormGroup<{
+    searchTerm: FormControl<string | null>;
+    searchType: FormControl<string | null>;
+  }>;
+  searchResults: SearchResult[] = [];
+  isLoading = false;
+  error: string | null = null;
 
-  searchTerm = signal('');
-  results = signal<any[]>([]);
-  selectedType: 'track' | 'artist' | 'album' = 'track';
+  constructor(
+    private spotifyService: SpotifyService,
+    private fb: FormBuilder
+  ) {
+    this.searchForm = this.fb.group({
+      searchTerm: [''],
+      searchType: ['track']
+    });
+  }
 
   ngOnInit() {
-    if (!this.spotifyService.isTokenValid()) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    this.searchForm.get('searchTerm')?.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      if (term) {
+        this.search(term);
+      } else {
+        this.searchResults = [];
+      }
+    });
+
+    this.searchForm.get('searchType')?.valueChanges.subscribe(() => {
+      const term = this.searchForm.get('searchTerm')?.value;
+      if (term) {
+        this.search(term);
+      }
+    });
   }
 
-  async search(term: string) {
-    this.searchTerm.set(term);
-    if (!term) {
-      this.results.set([]);
-      return;
-    }
+  search(term: string) {
+    this.isLoading = true;
+    this.error = null;
 
-    const items = await this.spotifyService.search(term, this.selectedType);
-    this.results.set(items);
+    this.spotifyService.search(term, this.searchForm.get('searchType')?.value || 'track').subscribe({
+      next: (items: SearchResult[]) => {
+        this.searchResults = items;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors de la recherche:', error);
+        this.error = 'Erreur lors de la recherche';
+        this.isLoading = false;
+      }
+    });
   }
 
-  onTypeChange(type: 'track' | 'artist' | 'album') {
-    this.selectedType = type;
-    this.search(this.searchTerm());
+  playTrack(uri: string) {
+    this.spotifyService.playTrack(uri).subscribe({
+      error: (error) => {
+        console.error('Erreur lors de la lecture:', error);
+        this.error = 'Erreur lors de la lecture';
+      }
+    });
   }
 
-  playPreview(url: string) {
-    const audio = new Audio(url);
-    audio.play();
-  }
-
-  getArtistNames(item: any): string {
-    return item.artists?.map((a: any) => a.name).join(', ') || '';
+  formatArtistNames(artists: Array<{ name: string }> | undefined): string {
+    return artists?.map(a => a.name).join(', ') || '';
   }
 }

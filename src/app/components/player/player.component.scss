@@ -2,3 +2,80 @@ ion-button {
   display: flex;
   justify-content: center;
 }
+
+ion-card {
+  background: #1a1a1a;
+  color: white;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+ion-card-header {
+  padding: 16px;
+}
+
+ion-card-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: white;
+}
+
+ion-card-subtitle {
+  color: #b3b3b3;
+}
+
+ion-card-content {
+  padding: 16px;
+}
+
+.album-art {
+  text-align: center;
+  margin-bottom: 16px;
+
+  img {
+    max-width: 200px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .time {
+    color: #b3b3b3;
+    font-size: 0.8em;
+    min-width: 40px;
+  }
+
+  ion-range {
+    --bar-background: #4a4a4a;
+    --bar-background-active: #1db954;
+    --knob-background: #1db954;
+    --pin-background: #1db954;
+    --height: 4px;
+  }
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+
+  ion-button {
+    --color: white;
+    --color-hover: #1db954;
+    --color-activated: #1db954;
+    --ripple-color: #1db954;
+    font-size: 24px;
+  }
+
+  ion-icon {
+    font-size: 24px;
+  }
+}
