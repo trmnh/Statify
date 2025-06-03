@@ -5,48 +5,63 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <p>Recherchez sur Spotify :</p>
+  <form [formGroup]="searchForm">
+    <ion-searchbar
+      formControlName="searchTerm"
+      placeholder="Rechercher..."
+      animated
+    ></ion-searchbar>
 
-  <ion-segment [ngModel]="selectedType" (ngModelChange)="onTypeChange($event)">
-    <ion-segment-button value="track">Titres</ion-segment-button>
-    <ion-segment-button value="artist">Artistes</ion-segment-button>
-    <ion-segment-button value="album">Albums</ion-segment-button>
-  </ion-segment>
+    <ion-segment formControlName="searchType">
+      <ion-segment-button value="track">
+        <ion-label>Titres</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="artist">
+        <ion-label>Artistes</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="album">
+        <ion-label>Albums</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="playlist">
+        <ion-label>Playlists</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </form>
 
-  <ion-searchbar
-    (ionInput)="search($event.detail.value || '')"
-    placeholder="Entrez un mot-clé"
-  ></ion-searchbar>
+  @if (isLoading) {
+    <ion-spinner name="crescent"></ion-spinner>
+  }
 
-  @if (results().length === 0 && searchTerm()) {
-  <p>Aucun résultat trouvé.</p>
+  @if (error) {
+    <ion-text color="danger">
+      <p>{{ error }}</p>
+    </ion-text>
+  }
+
+  @if (!isLoading && !error && searchResults.length === 0 && searchForm.get('searchTerm')?.value) {
+    <ion-text color="medium">
+      <p>Aucun résultat trouvé</p>
+    </ion-text>
   }
 
   <ion-list>
-    @for (item of results(); track $index) {
-    <ion-item>
-      @if (item.images?.length > 0 || item.album?.images?.length > 0) {
-      <ion-thumbnail slot="start">
-        <img [src]="item.images?.[0]?.url || item.album?.images?.[0]?.url" />
-      </ion-thumbnail>
-      }
-
-      <ion-label>
-        <h2>{{ item.name }}</h2>
-
-        @if (selectedType === 'track') {
-        <p>{{ getArtistNames(item) }}</p>
-        } @if (selectedType === 'album') {
-        <p>Album de : {{ getArtistNames(item) }}</p>
-        } @if (selectedType === 'artist') {
-        <p>Type : {{ item.type }}</p>
+    @for (item of searchResults; track item.id) {
+      <ion-item button (click)="playTrack(item.uri)">
+        @if (item.images && item.images.length > 0) {
+          <ion-thumbnail slot="start">
+            <img [src]="item.images[0].url" [alt]="item.name">
+          </ion-thumbnail>
         }
-      </ion-label>
-
-      @if (selectedType === 'track' && item.preview_url) {
-      <ion-button (click)="playPreview(item.preview_url)">play</ion-button>
-      }
-    </ion-item>
+        <ion-label>
+          <h2>{{ item.name }}</h2>
+          @if (item.artists) {
+            <p>{{ formatArtistNames(item.artists) }}</p>
+          }
+          @if (item.album) {
+            <p>{{ item.album.name }}</p>
+          }
+        </ion-label>
+      </ion-item>
     }
   </ion-list>
 </ion-content>

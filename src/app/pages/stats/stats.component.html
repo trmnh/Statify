@@ -5,12 +5,12 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (userProfile()) {
+  @if (userProfile$ | async; as profile) {
   <div>
-    <h2>{{ userProfile().display_name }}</h2>
-    @if (userProfile().images?.length > 0) {
+    <h2>{{ profile?.display_name }}</h2>
+    @if (hasProfileImage$ | async) {
     <img
-      [src]="userProfile().images[0]?.url"
+      [src]="profileImageUrl$ | async"
       alt="Avatar utilisateur"
       style="width: 100px; border-radius: 50%"
     />
@@ -20,32 +20,36 @@
 
   <h3>Top 10 artistes</h3>
   <ion-list>
-    @for (artist of topArtists(); track $index) {
-    <ion-item>
-      @if (artist.images?.length > 0) {
-      <ion-thumbnail slot="start">
-        <img [src]="artist.images[0].url" alt="Image artiste" />
-      </ion-thumbnail>
+    @if (topArtists$ | async; as artists) {
+      @for (artist of artists; track $index) {
+        <ion-item>
+          @if (artist?.images && artist.images.length > 0) {
+            <ion-thumbnail slot="start">
+              <img [src]="artist.images[0]?.url" alt="Image artiste" />
+            </ion-thumbnail>
+          }
+          <ion-label>{{ artist?.name }}</ion-label>
+        </ion-item>
       }
-      <ion-label>{{ artist.name }}</ion-label>
-    </ion-item>
     }
   </ion-list>
 
   <h3>Top 10 titres</h3>
   <ion-list>
-    @for (track of topTracks(); track $index) {
-    <ion-item>
-      @if (track.album?.images?.length > 0) {
-      <ion-thumbnail slot="start">
-        <img [src]="track.album.images[0].url" alt="Image album" />
-      </ion-thumbnail>
+    @if (topTracks$ | async; as tracks) {
+      @for (track of tracks; track $index) {
+        <ion-item>
+          @if (track?.album?.images && track.album.images.length > 0) {
+            <ion-thumbnail slot="start">
+              <img [src]="track.album.images[0]?.url" alt="Image album" />
+            </ion-thumbnail>
+          }
+          <ion-label>
+            <div>{{ track?.name }}</div>
+            <small>{{ formatArtistNames(track?.artists) }}</small>
+          </ion-label>
+        </ion-item>
       }
-      <ion-label>
-        <div>{{ track.name }}</div>
-        <small>{{ getArtistNames(track) }}</small>
-      </ion-label>
-    </ion-item>
     }
   </ion-list>
 
