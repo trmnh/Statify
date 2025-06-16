@@ -17,6 +17,8 @@ interface SpotifyTrack {
   album: {
     images: { url: string }[];
   };
+  duration_ms: number;
+  popularity: number;
 }
 
 interface SpotifySearchResult {
@@ -43,6 +45,14 @@ interface SpotifySearchResult {
   };
 }
 
+interface AudioFeatures {
+  valence: number;
+  energy: number;
+  danceability: number;
+  acousticness: number;
+  tempo: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -67,15 +77,13 @@ export class SpotifyService {
 
   private handleError(error: HttpErrorResponse) {
     console.error('Une erreur est survenue:', error);
-
-    if (error.status === 401) {
+    if (error.status === 401 || error.status === 403) {
       // Token expiré ou invalide
       localStorage.removeItem('spotifyToken');
       localStorage.removeItem('tokenExpiry');
       this.router.navigate(['/login']);
       return throwError(() => new Error('Session expirée, veuillez vous reconnecter'));
     }
-
     return throwError(() => error);
   }
 
@@ -132,8 +140,8 @@ export class SpotifyService {
     );
   }
 
-  getTopTracks(limit: number = 10): Observable<SpotifyTrack[]> {
-    return this.http.get<{ items: SpotifyTrack[] }>(`${this.baseUrl}/me/top/tracks?limit=${limit}`, {
+  getTopTracks(limit: number = 10, time_range: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'): Observable<SpotifyTrack[]> {
+    return this.http.get<{ items: SpotifyTrack[] }>(`${this.baseUrl}/me/top/tracks?limit=${limit}&time_range=${time_range}`, {
       headers: this.getHeaders()
     }).pipe(
       map(response => response.items),
@@ -141,8 +149,8 @@ export class SpotifyService {
     );
   }
 
-  getTopArtists(): Observable<SpotifyArtist[]> {
-    return this.http.get<{ items: SpotifyArtist[] }>(`${this.baseUrl}/me/top/artists?limit=10`, {
+  getTopArtists(limit: number = 10, time_range: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'): Observable<SpotifyArtist[]> {
+    return this.http.get<{ items: SpotifyArtist[] }>(`${this.baseUrl}/me/top/artists?limit=${limit}&time_range=${time_range}`, {
       headers: this.getHeaders()
     }).pipe(
       map(response => response.items),
@@ -259,6 +267,26 @@ export class SpotifyService {
       { headers: this.getHeaders() }
     ).pipe(
       catchError(this.handleError.bind(this))
+    );
+  }
+
+  getAudioFeatures(trackIds: string[]): Observable<AudioFeatures[]> {
+    const ids = trackIds.join(',');
+    console.log('Requesting audio features for tracks:', ids);
+    return this.http.get<{ audio_features: AudioFeatures[] }>(`${this.baseUrl}/audio-features?ids=${ids}`, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        console.log('Audio features response:', response);
+        return response.audio_features;
+      }),
+      catchError(error => {
+        console.error('Error fetching audio features:', error);
+        if (error.status === 403) {
+          console.error('Token might not have the required scopes. Required scopes: user-top-read, user-read-private');
+        }
+        return of([]);
+      })
     );
   }
 }

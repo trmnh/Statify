@@ -1,0 +1,27 @@
+.chart-container {
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+ion-grid {
+  padding: 16px;
+}
+
+ion-col {
+  padding: 8px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    margin-bottom: 16px;
+  }
+}

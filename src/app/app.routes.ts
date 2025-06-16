@@ -25,6 +25,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/search/search.component').then(m => m.SearchComponent)
       },
       {
+        path: 'top',
+        loadComponent: () => import('./pages/top/top.component').then(m => m.TopComponent)
+      },
+      {
         path: 'stats',
         loadComponent: () => import('./pages/stats/stats.component').then(m => m.StatsComponent)
       },

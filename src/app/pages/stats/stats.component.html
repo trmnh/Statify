@@ -1,57 +1,55 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Statistiques</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goToHome()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (userProfile$ | async; as profile) {
-  <div>
-    <h2>{{ profile?.display_name }}</h2>
-    @if (hasProfileImage$ | async) {
-    <img
-      [src]="profileImageUrl$ | async"
-      alt="Avatar utilisateur"
-      style="width: 100px; border-radius: 50%"
-    />
-    }
-  </div>
-  }
+  <ion-item>
+    <ion-label>Période</ion-label>
+    <ion-select [(ngModel)]="selectedPeriod" (ionChange)="onPeriodChange($event)">
+      <ion-select-option value="short_term">4 dernières semaines</ion-select-option>
+      <ion-select-option value="medium_term">6 derniers mois</ion-select-option>
+      <ion-select-option value="long_term">Tout le temps</ion-select-option>
+    </ion-select>
+  </ion-item>
 
-  <h3>Top 10 artistes</h3>
-  <ion-list>
-    @if (topArtists$ | async; as artists) {
-      @for (artist of artists; track $index) {
-        <ion-item>
-          @if (artist?.images && artist.images.length > 0) {
-            <ion-thumbnail slot="start">
-              <img [src]="artist.images[0]?.url" alt="Image artiste" />
-            </ion-thumbnail>
-          }
-          <ion-label>{{ artist?.name }}</ion-label>
-        </ion-item>
-      }
-    }
-  </ion-list>
-
-  <h3>Top 10 titres</h3>
-  <ion-list>
-    @if (topTracks$ | async; as tracks) {
-      @for (track of tracks; track $index) {
-        <ion-item>
-          @if (track?.album?.images && track.album.images.length > 0) {
-            <ion-thumbnail slot="start">
-              <img [src]="track.album.images[0]?.url" alt="Image album" />
-            </ion-thumbnail>
-          }
-          <ion-label>
-            <div>{{ track?.name }}</div>
-            <small>{{ formatArtistNames(track?.artists) }}</small>
-          </ion-label>
-        </ion-item>
-      }
-    }
-  </ion-list>
-
-  <ion-button expand="full" (click)="goToHome()">Retour à l'accueil</ion-button>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <div class="chart-container">
+          <div echarts [options]="artistsChartOption" style="height: 400px;"></div>
+        </div>
+      </ion-col>
+      <ion-col size="12" size-md="6">
+        <div class="chart-container">
+          <div echarts [options]="tracksChartOption" style="height: 400px;"></div>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <div class="chart-container">
+          <div echarts [options]="genresChartOption" style="height: 400px;"></div>
+        </div>
+      </ion-col>
+      <ion-col size="12" size-md="6">
+        <div class="chart-container">
+          <div echarts [options]="durationChartOption" style="height: 400px;"></div>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <div class="chart-container">
+          <div echarts [options]="radarChartOption" class="chart"></div>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
