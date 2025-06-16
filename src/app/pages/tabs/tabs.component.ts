@@ -9,7 +9,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
   standalone: true,
   imports: [IonicModule, RouterModule, CommonModule, NgxEchartsModule],
   templateUrl: './tabs.component.html',
-  styleUrls: ['./tabs.component.scss']
+  styleUrls: ['./tabs.component.scss'],
 })
 export class TabsComponent {
   constructor() {}
