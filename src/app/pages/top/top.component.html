@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Statistiques</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (userProfile$ | async; as profile) {
+  <div>
+    <h2>{{ profile?.display_name }}</h2>
+    @if (hasProfileImage$ | async) {
+    <img
+      [src]="profileImageUrl$ | async"
+      alt="Avatar utilisateur"
+      style="width: 100px; border-radius: 50%"
+    />
+    }
+  </div>
+  }
+
+  <form [formGroup]="statsForm">
+    <ion-segment formControlName="periodControl">
+      <ion-segment-button value="short_term">
+        <ion-label>30 jours</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="medium_term">
+        <ion-label>6 mois</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="long_term">
+        <ion-label>Année</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </form>
+
+  <h3>Top 10 artistes</h3>
+  <ion-list>
+    @if (topArtists$ | async; as artists) {
+      @for (artist of artists; track $index) {
+        <ion-item>
+          @if (artist?.images && artist.images.length > 0) {
+            <ion-thumbnail slot="start">
+              <img [src]="artist.images[0].url" alt="Image artiste" />
+            </ion-thumbnail>
+          }
+          <ion-label>{{ artist?.name }}</ion-label>
+        </ion-item>
+      }
+    }
+  </ion-list>
+
+  <h3>Top 10 titres</h3>
+  <ion-list>
+    @if (topTracks$ | async; as tracks) {
+      @for (track of tracks; track $index) {
+        <ion-item>
+          @if (track?.album?.images && track.album.images.length > 0) {
+            <ion-thumbnail slot="start">
+              <img [src]="track.album.images[0].url" alt="Image album" />
+            </ion-thumbnail>
+          }
+          <ion-label>
+            <div>{{ track?.name }}</div>
+            <small>{{ formatArtistNames(track?.artists) }}</small>
+          </ion-label>
+        </ion-item>
+      }
+    }
+  </ion-list>
+
+  <ion-button expand="full" (click)="goToHome()">Retour à l'accueil</ion-button>
+</ion-content>

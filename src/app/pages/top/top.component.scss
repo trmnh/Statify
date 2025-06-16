@@ -1,0 +1,31 @@
+ion-content {
+  --background: #18181b; // couleur de fond souhaitée
+  overflow-x: hidden;
+}
+
+ion-list, ion-item {
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  background: transparent !important;
+  --background: transparent !important;
+  --ion-item-background: transparent !important;
+  --ion-background-color: transparent !important;
+  --ion-background-color-rgb: 24, 24, 27 !important;
+  border: none !important;
+  --border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+ion-item {
+  --inner-border-width: 0 !important;
+  --border-width: 0 !important;
+  --border-style: none !important;
+}
+
+ion-thumbnail img {
+  max-width: 56px;
+  max-height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+}
