@@ -1,0 +1,19 @@
+ion-tab-bar {
+  --background: var(--ion-color-dark);
+  --color: var(--ion-color-light);
+  --color-selected: var(--ion-color-primary);
+  border-top: 1px solid var(--ion-color-secondary);
+}
+
+ion-tab-button {
+  --color: var(--ion-color-light);
+  --color-selected: var(--ion-color-primary);
+
+  ion-icon {
+    color: var(--ion-color-light);
+  }
+
+  &.tab-selected ion-icon {
+    color: var(--ion-color-primary);
+  }
+}
