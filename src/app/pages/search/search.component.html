@@ -19,49 +19,38 @@
       <ion-segment-button value="artist">
         <ion-label>Artistes</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="album">
-        <ion-label>Albums</ion-label>
-      </ion-segment-button>
       <ion-segment-button value="playlist">
         <ion-label>Playlists</ion-label>
       </ion-segment-button>
     </ion-segment>
   </form>
 
-  @if (isLoading) {
+  @if (loading) {
+  <div class="ion-text-center ion-padding">
     <ion-spinner name="crescent"></ion-spinner>
-  }
-
-  @if (error) {
-    <ion-text color="danger">
-      <p>{{ error }}</p>
-    </ion-text>
-  }
-
-  @if (!isLoading && !error && searchResults.length === 0 && searchForm.get('searchTerm')?.value) {
-    <ion-text color="medium">
-      <p>Aucun résultat trouvé</p>
-    </ion-text>
+  </div>
+  } @if (error) {
+  <ion-text color="danger">
+    <p class="ion-padding">{{ error }}</p>
+  </ion-text>
+  } @if (!loading && !error && getCurrentResults().length === 0 &&
+  searchForm.get('searchTerm')?.value) {
+  <ion-text color="medium">
+    <p class="ion-padding">Aucun résultat trouvé</p>
+  </ion-text>
   }
 
   <ion-list>
-    @for (item of searchResults; track item.id) {
-      <ion-item button (click)="playTrack(item.uri)">
-        @if (item.images && item.images.length > 0) {
-          <ion-thumbnail slot="start">
-            <img [src]="item.images[0].url" [alt]="item.name">
-          </ion-thumbnail>
-        }
-        <ion-label>
-          <h2>{{ item.name }}</h2>
-          @if (item.artists) {
-            <p>{{ formatArtistNames(item.artists) }}</p>
-          }
-          @if (item.album) {
-            <p>{{ item.album.name }}</p>
-          }
-        </ion-label>
-      </ion-item>
+    @for (item of getCurrentResults(); track item.id) {
+    <ion-item button (click)="handleItemClick(item)">
+      <ion-thumbnail slot="start">
+        <img [src]="getItemImage(item)" [alt]="item.name" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ item.name }}</h2>
+        <p>{{ getItemArtists(item) }}</p>
+      </ion-label>
+    </ion-item>
     }
   </ion-list>
 </ion-content>

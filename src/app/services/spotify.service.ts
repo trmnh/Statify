@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { SpotifyPlaylist, SpotifyProfile } from '../interfaces/spotify.interface';
+import {
+  SpotifyPlaylist,
+  SpotifyProfile,
+} from '../interfaces/spotify.interface';
 import { Router } from '@angular/router';
 
 interface SpotifyArtist {
@@ -54,20 +61,18 @@ interface AudioFeatures {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SpotifyService {
   private readonly baseUrl = 'https://api.spotify.com/v1';
-  private readonly clientId = 'YOUR_CLIENT_ID';
+  private readonly clientId = '75b8c3045ffd4e978b2f0d3b907d81e8';
   private readonly redirectUri = 'http://localhost:8100/callback';
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('spotifyToken');
+    console.log("[SpotifyService] Token utilisé pour l'API :", token);
     if (!token) {
       this.router.navigate(['/login']);
       throw new Error('Token non trouvé');
@@ -82,7 +87,9 @@ export class SpotifyService {
       localStorage.removeItem('spotifyToken');
       localStorage.removeItem('tokenExpiry');
       this.router.navigate(['/login']);
-      return throwError(() => new Error('Session expirée, veuillez vous reconnecter'));
+      return throwError(
+        () => new Error('Session expirée, veuillez vous reconnecter')
+      );
     }
     return throwError(() => error);
   }
@@ -97,74 +104,97 @@ export class SpotifyService {
   search(query: string, type: string): Observable<any[]> {
     if (!query) return of([]);
 
-    return this.http.get<SpotifySearchResult>(`${this.baseUrl}/search`, {
-      params: {
-        q: query,
-        type: type,
-        limit: '20'
-      },
-      headers: this.getHeaders()
-    }).pipe(
-      map(response => {
-        switch (type) {
-          case 'track':
-            return response.tracks?.items || [];
-          case 'artist':
-            return response.artists?.items || [];
-          case 'album':
-            return response.albums?.items || [];
-          case 'playlist':
-            return response.playlists?.items || [];
-          default:
-            return [];
-        }
-      }),
-      catchError(this.handleError.bind(this))
-    );
+    return this.http
+      .get<SpotifySearchResult>(`${this.baseUrl}/search`, {
+        params: {
+          q: query,
+          type: type,
+          limit: '20',
+        },
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        map((response) => {
+          switch (type) {
+            case 'track':
+              return response.tracks?.items || [];
+            case 'artist':
+              return response.artists?.items || [];
+            case 'album':
+              return response.albums?.items || [];
+            case 'playlist':
+              return response.playlists?.items || [];
+            default:
+              return [];
+          }
+        }),
+        catchError(this.handleError.bind(this))
+      );
   }
 
   getUserProfile(): Observable<SpotifyProfile> {
-    return this.http.get<SpotifyProfile>(`${this.baseUrl}/me`, {
-      headers: this.getHeaders()
-    }).pipe(
-      catchError(this.handleError.bind(this))
-    );
+    return this.http
+      .get<SpotifyProfile>(`${this.baseUrl}/me`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(catchError(this.handleError.bind(this)));
   }
 
   getUserPlaylists(limit: number = 3): Observable<SpotifyPlaylist[]> {
-    return this.http.get<{ items: SpotifyPlaylist[] }>(`${this.baseUrl}/me/playlists?limit=${limit}`, {
-      headers: this.getHeaders()
-    }).pipe(
-      map(response => response.items),
-      catchError(this.handleError.bind(this))
-    );
+    return this.http
+      .get<{ items: SpotifyPlaylist[] }>(
+        `${this.baseUrl}/me/playlists?limit=${limit}`,
+        {
+          headers: this.getHeaders(),
+        }
+      )
+      .pipe(
+        map((response) => response.items),
+        catchError(this.handleError.bind(this))
+      );
   }
 
-  getTopTracks(limit: number = 10, time_range: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'): Observable<SpotifyTrack[]> {
-    return this.http.get<{ items: SpotifyTrack[] }>(`${this.baseUrl}/me/top/tracks?limit=${limit}&time_range=${time_range}`, {
-      headers: this.getHeaders()
-    }).pipe(
-      map(response => response.items),
-      catchError(this.handleError.bind(this))
-    );
+  getTopTracks(
+    limit: number = 10,
+    time_range: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'
+  ): Observable<SpotifyTrack[]> {
+    return this.http
+      .get<{ items: SpotifyTrack[] }>(
+        `${this.baseUrl}/me/top/tracks?limit=${limit}&time_range=${time_range}`,
+        {
+          headers: this.getHeaders(),
+        }
+      )
+      .pipe(
+        map((response) => response.items),
+        catchError(this.handleError.bind(this))
+      );
   }
 
-  getTopArtists(limit: number = 10, time_range: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'): Observable<SpotifyArtist[]> {
-    return this.http.get<{ items: SpotifyArtist[] }>(`${this.baseUrl}/me/top/artists?limit=${limit}&time_range=${time_range}`, {
-      headers: this.getHeaders()
-    }).pipe(
-      map(response => response.items),
-      catchError(this.handleError.bind(this))
-    );
+  getTopArtists(
+    limit: number = 10,
+    time_range: 'short_term' | 'medium_term' | 'long_term' = 'medium_term'
+  ): Observable<SpotifyArtist[]> {
+    return this.http
+      .get<{ items: SpotifyArtist[] }>(
+        `${this.baseUrl}/me/top/artists?limit=${limit}&time_range=${time_range}`,
+        {
+          headers: this.getHeaders(),
+        }
+      )
+      .pipe(
+        map((response) => response.items),
+        catchError(this.handleError.bind(this))
+      );
   }
 
   getUserStats(): Observable<any> {
     return this.getUserProfile().pipe(
-      switchMap(profile => 
+      switchMap((profile) =>
         this.getTopTracks().pipe(
-          map(tracks => ({
+          map((tracks) => ({
             profile,
-            topTracks: tracks
+            topTracks: tracks,
           }))
         )
       ),
@@ -174,11 +204,12 @@ export class SpotifyService {
 
   createTopTracksPlaylist(): Observable<SpotifyPlaylist> {
     return this.getUserProfile().pipe(
-      switchMap(profile => {
+      switchMap((profile) => {
         const playlistData = {
           name: 'Top Tracks Playlist',
-          description: 'Playlist générée automatiquement avec vos titres préférés',
-          public: false
+          description:
+            'Playlist générée automatiquement avec vos titres préférés',
+          public: false,
         };
 
         return this.http.post<SpotifyPlaylist>(
@@ -187,17 +218,17 @@ export class SpotifyService {
           { headers: this.getHeaders() }
         );
       }),
-      switchMap(playlist => {
+      switchMap((playlist) => {
         return this.getTopTracks().pipe(
-          switchMap(tracks => {
-            const trackUris = tracks.map(track => track.uri);
-            return this.http.post(
-              `${this.baseUrl}/playlists/${playlist.id}/tracks`,
-              { uris: trackUris },
-              { headers: this.getHeaders() }
-            ).pipe(
-              map(() => playlist)
-            );
+          switchMap((tracks) => {
+            const trackUris = tracks.map((track) => track.uri);
+            return this.http
+              .post(
+                `${this.baseUrl}/playlists/${playlist.id}/tracks`,
+                { uris: trackUris },
+                { headers: this.getHeaders() }
+              )
+              .pipe(map(() => playlist));
           })
         );
       }),
@@ -205,87 +236,105 @@ export class SpotifyService {
     );
   }
 
-  playTrack(uri: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/me/player/devices`, {
-      headers: this.getHeaders()
-    }).pipe(
-      switchMap((response: any) => {
-        const activeDevice = response.devices.find((device: any) => device.is_active);
-        if (!activeDevice) {
-          return throwError(() => new Error('Aucun appareil actif trouvé'));
-        }
+  playTrack(uri: string, play: boolean = false): Observable<any> {
+    return this.http
+      .get(`${this.baseUrl}/me/player/devices`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        switchMap((response: any) => {
+          const activeDevice = response.devices.find(
+            (device: any) => device.is_active
+          );
+          if (!activeDevice) {
+            return throwError(() => new Error('Aucun appareil actif trouvé'));
+          }
 
-        return this.http.put(
-          `${this.baseUrl}/me/player/play?device_id=${activeDevice.id}`,
-          { uris: [uri] },
-          { headers: this.getHeaders() }
-        );
-      }),
-      catchError(this.handleError.bind(this))
-    );
+          return this.http.put(
+            `${this.baseUrl}/me/player/play?device_id=${activeDevice.id}`,
+            { uris: [uri], play: play },
+            { headers: this.getHeaders() }
+          );
+        }),
+        catchError(this.handleError.bind(this))
+      );
   }
 
-  playPlaylist(playlistId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/me/player/devices`, {
-      headers: this.getHeaders()
-    }).pipe(
-      switchMap((response: any) => {
-        const devices = response.devices;
-        const activeDevice = devices.find((device: any) => device.is_active) || devices[0];
-        
-        if (!activeDevice) {
-          throw new Error('Aucun appareil actif trouvé');
-        }
+  playPlaylist(playlistId: string, play: boolean = false): Observable<any> {
+    return this.http
+      .get(`${this.baseUrl}/me/player/devices`, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        switchMap((response: any) => {
+          const devices = response.devices;
+          const activeDevice =
+            devices.find((device: any) => device.is_active) || devices[0];
 
-        return this.http.put(
-          `${this.baseUrl}/me/player/play?device_id=${activeDevice.id}`,
-          { context_uri: `spotify:playlist:${playlistId}` },
-          { headers: this.getHeaders() }
-        );
-      }),
-      catchError(this.handleError.bind(this))
-    );
+          if (!activeDevice) {
+            throw new Error('Aucun appareil actif trouvé');
+          }
+
+          return this.http.put(
+            `${this.baseUrl}/me/player/play?device_id=${activeDevice.id}`,
+            { context_uri: `spotify:playlist:${playlistId}`, play: play },
+            { headers: this.getHeaders() }
+          );
+        }),
+        catchError(this.handleError.bind(this))
+      );
   }
 
   startPlayback(): Observable<any> {
-    return this.http.put(
-      `${this.baseUrl}/me/player/play`,
-      {},
-      { headers: this.getHeaders() }
-    ).pipe(
-      catchError(this.handleError.bind(this))
-    );
+    return this.http
+      .put(`${this.baseUrl}/me/player/play`, {}, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError.bind(this)));
   }
 
   transferPlayback(deviceId: string): Observable<any> {
-    return this.http.put(
-      `${this.baseUrl}/me/player`,
-      {
-        device_ids: [deviceId],
-        play: true
-      },
-      { headers: this.getHeaders() }
-    ).pipe(
-      catchError(this.handleError.bind(this))
-    );
+    return this.http
+      .put(
+        `${this.baseUrl}/me/player`,
+        {
+          device_ids: [deviceId],
+          play: false,
+        },
+        { headers: this.getHeaders() }
+      )
+      .pipe(catchError(this.handleError.bind(this)));
   }
 
-  getAudioFeatures(trackIds: string[]): Observable<AudioFeatures[]> {
-    const ids = trackIds.join(',');
-    console.log('Requesting audio features for tracks:', ids);
-    return this.http.get<{ audio_features: AudioFeatures[] }>(`${this.baseUrl}/audio-features?ids=${ids}`, {
-      headers: this.getHeaders()
-    }).pipe(
-      map(response => {
-        console.log('Audio features response:', response);
-        return response.audio_features;
-      }),
-      catchError(error => {
-        console.error('Error fetching audio features:', error);
-        if (error.status === 403) {
-          console.error('Token might not have the required scopes. Required scopes: user-top-read, user-read-private');
+  getRecommendations(limit: number = 20): Observable<SpotifyTrack[]> {
+    return this.getTopTracks(5).pipe(
+      switchMap((tracks) => {
+        let params: any = { limit: limit.toString(), min_popularity: '50' };
+        let usedFallback = false;
+        // On récupère jusqu'à 5 IDs valides
+        const ids = tracks
+          .slice(0, 5)
+          .map((track) => track.uri.split(':').pop())
+          .filter((id) => id && id.length === 22);
+        if (ids.length > 0) {
+          params.seed_tracks = ids.join(',');
+        } else {
+          // Fallback : on utilise le genre pop
+          params.seed_genres = 'pop';
+          usedFallback = true;
         }
-        return of([]);
+        console.log(
+          '[SpotifyService] Params utilisés pour recommendations:',
+          params,
+          usedFallback ? '(fallback genre pop)' : ''
+        );
+        return this.http
+          .get<{ tracks: SpotifyTrack[] }>(`${this.baseUrl}/recommendations`, {
+            params,
+            headers: this.getHeaders(),
+          })
+          .pipe(
+            map((response) => response.tracks),
+            catchError(this.handleError.bind(this))
+          );
       })
     );
   }

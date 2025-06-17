@@ -4,12 +4,9 @@ import { IonicModule } from '@ionic/angular';
 import { SpotifyService } from '../../services/spotify.service';
 import { Subscription, interval } from 'rxjs';
 import { addIcons } from 'ionicons';
-import { 
-  play, 
-  pause, 
-  playBack, 
-  playForward 
-} from 'ionicons/icons';
+import { play, pause, playBack, playForward } from 'ionicons/icons';
+import { SpotifyPlayerService } from '../../services/player/spotify-player.service';
+import { SpotifyDevice } from '../../interfaces/user.interface';
 
 declare global {
   interface Window {
@@ -23,7 +20,7 @@ declare global {
   standalone: true,
   imports: [CommonModule, IonicModule],
   templateUrl: './player.component.html',
-  styleUrls: ['./player.component.scss']
+  styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent implements OnInit, OnDestroy {
   private player: any;
@@ -36,13 +33,14 @@ export class PlayerComponent implements OnInit, OnDestroy {
   public currentPosition: number = 0;
   public duration: number = 0;
   private positionUpdateInterval: Subscription | null = null;
+  devices: SpotifyDevice[] = [];
 
   constructor(private spotifyService: SpotifyService) {
     addIcons({
-      'play': play,
-      'pause': pause,
+      play: play,
+      pause: pause,
       'play-back': playBack,
-      'play-forward': playForward
+      'play-forward': playForward,
     });
   }
 
@@ -122,21 +120,24 @@ export class PlayerComponent implements OnInit, OnDestroy {
         console.log('Demande de token...');
         cb(this.token!);
       },
-      volume: 0.5
+      volume: 0.5,
     });
 
     this.player.addListener('ready', ({ device_id }: { device_id: string }) => {
       console.log('Lecteur prêt avec Device ID:', device_id);
       this.deviceId = device_id;
-      this.isPlaying = true;
+      this.isPlaying = false;
       this.transferPlayback();
       this.startPositionUpdates();
     });
 
-    this.player.addListener('not_ready', ({ device_id }: { device_id: string }) => {
-      console.log('Lecteur non prêt:', device_id);
-      this.isPlaying = false;
-    });
+    this.player.addListener(
+      'not_ready',
+      ({ device_id }: { device_id: string }) => {
+        console.log('Lecteur non prêt:', device_id);
+        this.isPlaying = false;
+      }
+    );
 
     this.player.addListener('player_state_changed', (state: any) => {
       console.log('État du lecteur changé:', state);
@@ -145,43 +146,58 @@ export class PlayerComponent implements OnInit, OnDestroy {
         this.isPlaying = !state.paused;
         this.currentPosition = state.position;
         this.duration = state.duration;
-        
+
         if (this.isPlaying) {
           this.startPositionUpdates();
         }
       }
     });
 
-    this.player.addListener('initialization_error', ({ message }: { message: string }) => {
-      console.error('Erreur d\'initialisation:', message);
-      this.error = message;
-    });
+    this.player.addListener(
+      'initialization_error',
+      ({ message }: { message: string }) => {
+        console.error("Erreur d'initialisation:", message);
+        this.error = message;
+      }
+    );
 
-    this.player.addListener('authentication_error', ({ message }: { message: string }) => {
-      console.error('Erreur d\'authentification:', message);
-      this.error = message;
-    });
+    this.player.addListener(
+      'authentication_error',
+      ({ message }: { message: string }) => {
+        console.error("Erreur d'authentification:", message);
+        this.error = message;
+      }
+    );
 
-    this.player.addListener('account_error', ({ message }: { message: string }) => {
-      console.error('Erreur de compte:', message);
-      this.error = message;
-    });
+    this.player.addListener(
+      'account_error',
+      ({ message }: { message: string }) => {
+        console.error('Erreur de compte:', message);
+        this.error = message;
+      }
+    );
 
-    this.player.addListener('playback_error', ({ message }: { message: string }) => {
-      console.error('Erreur de lecture:', message);
-      this.error = message;
-    });
+    this.player.addListener(
+      'playback_error',
+      ({ message }: { message: string }) => {
+        console.error('Erreur de lecture:', message);
+        this.error = message;
+      }
+    );
 
     console.log('Tentative de connexion au lecteur...');
-    this.player.connect().then((success: boolean) => {
-      if (success) {
-        console.log('Connexion au lecteur réussie');
-      } else {
-        console.error('Échec de la connexion au lecteur');
-      }
-    }).catch((error: any) => {
-      console.error('Erreur lors de la connexion au lecteur:', error);
-    });
+    this.player
+      .connect()
+      .then((success: boolean) => {
+        if (success) {
+          console.log('Connexion au lecteur réussie');
+        } else {
+          console.error('Échec de la connexion au lecteur');
+        }
+      })
+      .catch((error: any) => {
+        console.error('Erreur lors de la connexion au lecteur:', error);
+      });
   }
 
   private transferPlayback() {
@@ -193,7 +209,8 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.spotifyService.transferPlayback(this.deviceId).subscribe({
         next: () => console.log('Transfert de la lecture réussi'),
-        error: (error) => console.error('Erreur lors du transfert de la lecture:', error)
+        error: (error) =>
+          console.error('Erreur lors du transfert de la lecture:', error),
       })
     );
   }
@@ -214,7 +231,8 @@ export class PlayerComponent implements OnInit, OnDestroy {
           this.subscription.add(
             this.spotifyService.startPlayback().subscribe({
               next: () => console.log('Lecture démarrée'),
-              error: (error) => console.error('Erreur lors du démarrage de la lecture:', error)
+              error: (error) =>
+                console.error('Erreur lors du démarrage de la lecture:', error),
             })
           );
         } else {

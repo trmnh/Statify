@@ -35,7 +35,7 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
-
+/*
 @media screen and (min-width: 768px) {
   app-root {
     display: none;
@@ -51,7 +51,7 @@
     background-color: #000;
     height: 100vh;
   }
-}
+} */
 
 ion-content {
   pointer-events: auto !important;
@@ -109,7 +109,12 @@ ion-list {
 }
 
 /* Styles pour les titres */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--ion-color-light);
   font-weight: 600;
 }
@@ -128,7 +133,8 @@ ion-badge {
 }
 
 /* Styles pour les inputs */
-ion-input, ion-textarea {
+ion-input,
+ion-textarea {
   --background: var(--ion-color-secondary);
   --color: var(--ion-color-light);
   --placeholder-color: var(--ion-color-tertiary);

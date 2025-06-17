@@ -37,7 +37,9 @@ export class LoginComponent {
       `?client_id=${environment.spotifyClientId}` +
       `&response_type=token` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&scope=${scopes}`;
+      `&scope=${scopes}` +
+      `&show_dialog=true` +
+      `&state=${Math.random().toString(36).substring(2)}`;
 
     console.log('Redirection vers Spotify :', authUrl);
     window.location.href = authUrl;
@@ -55,12 +57,10 @@ export class LoginComponent {
       if (token && expiresIn) {
         console.log('Token trouvé :', token);
         localStorage.setItem('spotifyToken', token);
-        
-      
-        const expiryTime = Date.now() + (parseInt(expiresIn) * 1000);
+
+        const expiryTime = Date.now() + parseInt(expiresIn) * 1000;
         localStorage.setItem('tokenExpiry', expiryTime.toString());
 
-       
         this.router.navigate(['/tabs/home']);
       }
     }

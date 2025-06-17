@@ -9,38 +9,53 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
+    loadComponent: () =>
+      import('./pages/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'tabs',
-    loadComponent: () => import('./pages/tabs/tabs.component').then(m => m.TabsComponent),
+    loadComponent: () =>
+      import('./pages/tabs/tabs.component').then((m) => m.TabsComponent),
     canActivate: [spotifyAuthGuard],
     children: [
       {
         path: 'home',
-        loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
+        loadComponent: () =>
+          import('./pages/home/home.component').then((m) => m.HomeComponent),
       },
       {
         path: 'search',
-        loadComponent: () => import('./pages/search/search.component').then(m => m.SearchComponent)
+        loadComponent: () =>
+          import('./pages/search/search.component').then(
+            (m) => m.SearchComponent
+          ),
       },
       {
         path: 'top',
-        loadComponent: () => import('./pages/top/top.component').then(m => m.TopComponent)
+        loadComponent: () =>
+          import('./pages/top/top.component').then((m) => m.TopComponent),
       },
       {
         path: 'stats',
-        loadComponent: () => import('./pages/stats/stats.component').then(m => m.StatsComponent)
+        loadComponent: () =>
+          import('./pages/stats/stats.component').then((m) => m.StatsComponent),
+      },
+      {
+        path: 'discover',
+        loadComponent: () =>
+          import('./pages/discover/discover.component').then(
+            (m) => m.DiscoverComponent
+          ),
       },
       {
         path: '',
         redirectTo: 'home',
-        pathMatch: 'full'
-      }
-    ]
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: '**',
-    redirectTo: 'tabs/home'
-  }
+    redirectTo: 'tabs/home',
+  },
 ];
