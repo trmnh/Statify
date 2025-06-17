@@ -1,16 +1,14 @@
 import { inject } from '@angular/core';
-import { Router, type CanActivateFn } from '@angular/router';
-import { SpotifyService } from '../services/spotify.service';
+import { Router } from '@angular/router';
+import { SpotifyAuthService } from '../services/auth/spotify-auth.service';
 
-export const spotifyAuthGuard: CanActivateFn = (route, state) => {
-  const spotifyService = inject(SpotifyService);
+export const spotifyAuthGuard = () => {
   const router = inject(Router);
+  const authService = inject(SpotifyAuthService);
 
-  if (spotifyService.isTokenValid()) {
+  if (authService.isTokenValid()) {
     return true;
   }
 
-  // Rediriger vers la page de login si non authentifié
-  router.navigate(['/login']);
-  return false;
-}; 
+  return router.parseUrl('/login');
+};

@@ -1,0 +1,108 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Découvrir</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (isLoading) {
+  <ion-spinner name="crescent" color="primary"></ion-spinner>
+  <p>Chargement des recommandations...</p>
+  } @else if (error) {
+  <ion-text color="danger">
+    <p>{{ error }}</p>
+  </ion-text>
+  } @else {
+  <div class="card-stack-container">
+    @if (currentTrack$ | async; as track) {
+    <ion-card
+      class="recommendation-card active-card"
+      (swipeleft)="onSwipeLeft()"
+      (swiperight)="onSwipeRight()"
+    >
+      <img [src]="track.album.images[0]?.url" alt="Album Art" />
+      <ion-card-header>
+        <ion-card-title>{{ track.name }}</ion-card-title>
+        <ion-card-subtitle>{{
+          formatArtists(track.artists)
+        }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button
+          expand="block"
+          color="success"
+          class="spotify-btn"
+          (click)="playInApp(track)"
+        >
+          <ion-icon slot="start" name="logo-spotify"></ion-icon>
+          Jouer sur Spotify
+        </ion-button>
+        @if (track.preview_url) {
+        <div class="audio-player">
+          <ion-button
+            fill="clear"
+            color="medium"
+            class="preview-btn"
+            (click)="togglePlay(audioPlayer)"
+          >
+            <ion-icon
+              [name]="isPlaying ? 'pause' : 'play'"
+              size="large"
+            ></ion-icon>
+          </ion-button>
+          <audio #audioPlayer [src]="track.preview_url"></audio>
+        </div>
+        }
+        <div class="action-buttons-tinder">
+          <div class="action-btn-col">
+            <ion-button shape="round" color="danger" (click)="onSwipeLeft()">
+              <ion-icon name="close-outline" size="large"></ion-icon>
+            </ion-button>
+            <span>Non</span>
+          </div>
+          <div class="action-btn-col">
+            <ion-button
+              shape="round"
+              color="warning"
+              (click)="onSuperlike(track)"
+            >
+              <ion-icon name="star-outline" size="large"></ion-icon>
+            </ion-button>
+            <span>Superlike</span>
+          </div>
+          <div class="action-btn-col">
+            <ion-button shape="round" color="success" (click)="onSwipeRight()">
+              <ion-icon name="heart-outline" size="large"></ion-icon>
+            </ion-button>
+            <span>Oui</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    }
+    <!-- Affichez quelques cartes suivantes pour l'effet de pile -->
+    @for (track of (recommendationQueue$ | async); track track.id; let i =
+    $index) { @if (i < 3) {
+    <!-- Limiter à 3 cartes derrière -->
+    <ion-card class="recommendation-card next-card card-{{ i }}">
+      <img [src]="track.album.images[0]?.url" alt="Album Art" />
+      <ion-card-header>
+        <ion-card-title>{{ track.name }}</ion-card-title>
+        <ion-card-subtitle>{{
+          formatArtists(track.artists)
+        }}</ion-card-subtitle>
+      </ion-card-header>
+    </ion-card>
+    } } @if (!(currentTrack$ | async) && !(recommendationQueue$ |
+    async)?.length) {
+    <ion-text>
+      <p>Aucune recommandation disponible pour le moment.</p>
+      <ion-button (click)="loadInitialRecommendations()"
+        >Recharger les recommandations</ion-button
+      >
+    </ion-text>
+    }
+  </div>
+  <app-player></app-player>
+  }
+</ion-content>
