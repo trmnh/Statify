@@ -15,6 +15,13 @@ import {
   searchOutline,
   statsChartOutline,
   musicalNotesOutline,
+  compassOutline,
+  discOutline,
+  discSharp,
+  musicalNote,
+  disc,
+  person,
+  list,
 } from 'ionicons/icons';
 
 addIcons({
@@ -30,6 +37,13 @@ addIcons({
   pause,
   'play-circle': playCircle,
   'pause-circle': pauseCircle,
+  'compass-outline': compassOutline,
+  'disc-outline': discOutline,
+  'disc-sharp': discSharp,
+  'musical-note': musicalNote,
+  disc: disc,
+  person: person,
+  list: list,
 });
 
 setTimeout(() => {

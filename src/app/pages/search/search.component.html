@@ -8,49 +8,63 @@
   <form [formGroup]="searchForm">
     <ion-searchbar
       formControlName="searchTerm"
-      placeholder="Rechercher..."
+      placeholder="Rechercher des titres, artistes ou playlists..."
       animated
+      debounce="300"
     ></ion-searchbar>
-
-    <ion-segment formControlName="searchType">
-      <ion-segment-button value="track">
-        <ion-label>Titres</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="artist">
-        <ion-label>Artistes</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="playlist">
-        <ion-label>Playlists</ion-label>
-      </ion-segment-button>
-    </ion-segment>
   </form>
 
   @if (loading) {
-  <div class="ion-text-center ion-padding">
+  <div class="loading-message">
     <ion-spinner name="crescent"></ion-spinner>
+    <p>Recherche en cours...</p>
   </div>
   } @if (error) {
-  <ion-text color="danger">
-    <p class="ion-padding">{{ error }}</p>
-  </ion-text>
-  } @if (!loading && !error && getCurrentResults().length === 0 &&
-  searchForm.get('searchTerm')?.value) {
-  <ion-text color="medium">
-    <p class="ion-padding">Aucun résultat trouvé</p>
-  </ion-text>
-  }
-
+  <div class="error-message">
+    <ion-text color="danger">
+      <p>{{ error }}</p>
+    </ion-text>
+  </div>
+  } @if (showNoResults()) {
+  <div class="no-results">
+    <ion-text color="medium">
+      <p>Aucun résultat trouvé</p>
+    </ion-text>
+  </div>
+  } @if (showResults()) {
   <ion-list>
-    @for (item of getCurrentResults(); track item.id) {
-    <ion-item button (click)="handleItemClick(item)">
-      <ion-thumbnail slot="start">
+    @for (item of searchResults; track trackById($index, item)) {
+    <ion-item
+      [detail]="false"
+      (click)="handleItemClick(item)"
+      class="search-item"
+    >
+      <ion-thumbnail slot="start" class="item-thumbnail">
         <img [src]="getItemImage(item)" [alt]="item.name" />
+        <div class="item-type-icon">
+          <ion-icon [name]="getItemIcon(item)"></ion-icon>
+        </div>
       </ion-thumbnail>
       <ion-label>
-        <h2>{{ item.name }}</h2>
-        <p>{{ getItemArtists(item) }}</p>
+        <h2 class="item-title">{{ item.name }}</h2>
+        <p class="item-subtitle">{{ getItemSubtitle(item) }}</p>
       </ion-label>
+      <ion-icon
+        *ngIf="showPlayIcon(item)"
+        slot="end"
+        name="play-circle"
+        class="play-icon"
+        (click)="playItem(item); $event.stopPropagation()"
+      >
+      </ion-icon>
     </ion-item>
     }
   </ion-list>
+  } @if (showEmptyState()) {
+  <div class="empty-state">
+    <ion-icon name="search" size="large"></ion-icon>
+    <h3>Recherchez votre musique</h3>
+    <p>Tapez le nom d'un titre, d'un artiste ou d'une playlist</p>
+  </div>
+  }
 </ion-content>

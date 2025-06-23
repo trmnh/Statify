@@ -146,4 +146,16 @@ export class SpotifyUserService {
       )
       .pipe(catchError(this.authService.handleError.bind(this.authService)));
   }
+
+  getRecentlyPlayed(limit: number = 50): Observable<any[]> {
+    return this.http
+      .get<{ items: Array<{ track: SpotifyTrack; played_at: string }> }>(
+        `${this.baseUrl}/me/player/recently-played?limit=${limit}`,
+        { headers: this.authService.getHeaders() }
+      )
+      .pipe(
+        map((response) => response.items),
+        catchError(this.authService.handleError.bind(this.authService))
+      );
+  }
 }

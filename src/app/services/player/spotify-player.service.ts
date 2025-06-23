@@ -63,6 +63,45 @@ export class SpotifyPlayerService {
       );
   }
 
+  searchAll(query: string): Observable<{
+    tracks: SpotifyTrack[];
+    artists: SpotifyArtist[];
+    playlists: SpotifyPlaylist[];
+  }> {
+    if (!query) {
+      return new Observable((subscriber) =>
+        subscriber.next({ tracks: [], artists: [], playlists: [] })
+      );
+    }
+
+    return this.http
+      .get<SpotifySearchResult>(`${this.baseUrl}/search`, {
+        params: {
+          q: query,
+          type: 'track,artist,playlist',
+          limit: '10',
+        },
+        headers: this.authService.getHeaders(),
+      })
+      .pipe(
+        map((response) => ({
+          tracks:
+            response.tracks?.items?.filter(
+              (item) => item && item.id && item.name
+            ) || [],
+          artists:
+            response.artists?.items?.filter(
+              (item) => item && item.id && item.name
+            ) || [],
+          playlists:
+            response.playlists?.items?.filter(
+              (item) => item && item.id && item.name
+            ) || [],
+        })),
+        catchError(this.authService.handleError.bind(this.authService))
+      );
+  }
+
   playTrack(uri: string, play: boolean = false): Observable<any> {
     return this.getActiveDevice().pipe(
       switchMap((device) => {
@@ -141,5 +180,42 @@ export class SpotifyPlayerService {
         { headers: this.authService.getHeaders() }
       )
       .pipe(catchError(this.authService.handleError.bind(this.authService)));
+  }
+
+  playArtistTopTracks(artistId: string): Observable<any> {
+    return this.http
+      .get<{ tracks: SpotifyTrack[] }>(
+        `${this.baseUrl}/artists/${artistId}/top-tracks`,
+        {
+          params: { market: 'from_token' },
+          headers: this.authService.getHeaders(),
+        }
+      )
+      .pipe(
+        switchMap((response) => {
+          if (response.tracks && response.tracks.length > 0) {
+            const uris = response.tracks.map((track) => track.uri);
+            return this.getActiveDevice().pipe(
+              switchMap((device) => {
+                if (!device) {
+                  return throwError(
+                    () => new Error('Aucun appareil actif trouvé')
+                  );
+                }
+                return this.http.put(
+                  `${this.baseUrl}/me/player/play?device_id=${device.id}`,
+                  { uris: uris, play: true },
+                  { headers: this.authService.getHeaders() }
+                );
+              })
+            );
+          } else {
+            return throwError(
+              () => new Error('Aucun top track trouvé pour cet artiste')
+            );
+          }
+        }),
+        catchError(this.authService.handleError.bind(this.authService))
+      );
   }
 }

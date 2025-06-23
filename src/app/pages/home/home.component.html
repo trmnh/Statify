@@ -3,15 +3,23 @@
     <ion-title>Statify</ion-title>
     <ion-buttons slot="end">
       @if (userProfile) {
-        <ion-item lines="none" class="profile-item" button (click)="presentPopover($event)">
-          @if (userProfile.images && userProfile.images.length > 0) {
-            <ion-avatar slot="start">
-              <img [src]="userProfile.images[0].url" [alt]="userProfile.display_name">
-            </ion-avatar>
-          }
-          <ion-label>{{ userProfile.display_name }}</ion-label>
-          <ion-icon name="chevron-down" slot="end"></ion-icon>
-        </ion-item>
+      <ion-item
+        lines="none"
+        class="profile-item"
+        button
+        (click)="presentPopover($event)"
+      >
+        @if (userProfile.images && userProfile.images.length > 0) {
+        <ion-avatar slot="start">
+          <img
+            [src]="userProfile.images[0].url"
+            [alt]="userProfile.display_name"
+          />
+        </ion-avatar>
+        }
+        <ion-label>{{ userProfile.display_name }}</ion-label>
+        <ion-icon name="chevron-down" slot="end"></ion-icon>
+      </ion-item>
       }
     </ion-buttons>
   </ion-toolbar>
@@ -19,40 +27,38 @@
 
 <ion-content class="ion-padding">
   <h2>Bienvenue sur Statify</h2>
-  <ion-button expand="full" (click)="goToStats()">Voir mes stats</ion-button>
-  <ion-button expand="full" (click)="generateTopTracksPlaylist()">
+  <ion-button (click)="goToStats()">Voir mes stats</ion-button>
+  <ion-button (click)="generateTopTracksPlaylist()">
     Générer ma playlist test top titres
   </ion-button>
 
   @if (isLoading) {
-    <ion-spinner name="crescent"></ion-spinner>
-  }
-
-  @if (error) {
-    <ion-text color="danger">
-      <p>{{ error }}</p>
-    </ion-text>
+  <ion-spinner name="crescent"></ion-spinner>
+  } @if (error) {
+  <ion-text color="danger">
+    <p>{{ error }}</p>
+  </ion-text>
   }
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Vos playlists</ion-card-title>
+      <ion-card-title class="ion-card-title">Vos playlists</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
       @for (playlist of playlists; track playlist.id) {
-        <ion-item button (click)="playPlaylist(playlist.id)">
-          @if (playlist.images && playlist.images.length > 0) {
-            <ion-thumbnail slot="start">
-              <img [src]="playlist.images[0].url" [alt]="playlist.name">
-            </ion-thumbnail>
-          }
-          <ion-label>
-            <h2>{{ playlist.name }}</h2>
-            <p>{{ playlist.description || 'Pas de description' }}</p>
-            <p>{{ playlist.tracks.total }} titres</p>
-          </ion-label>
-        </ion-item>
+      <ion-item button (click)="playPlaylist(playlist.id)">
+        @if (playlist.images && playlist.images.length > 0) {
+        <ion-thumbnail slot="start">
+          <img [src]="playlist.images[0].url" [alt]="playlist.name" />
+        </ion-thumbnail>
+        }
+        <ion-label>
+          <h2>{{ playlist.name }}</h2>
+          <p>{{ playlist.description || "Pas de description" }}</p>
+          <p>{{ playlist.tracks.total }} titres</p>
+        </ion-label>
+      </ion-item>
       }
     </ion-card-content>
   </ion-card>

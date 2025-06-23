@@ -4,8 +4,14 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-button expand="full" (click)="login()"
-    >Se connecter avec Spotify</ion-button
-  >
+<ion-content class="login-content">
+  <div class="logo-container">
+    <img src="assets/icon/logo.png" alt="Logo Statify" class="logo-img" />
+    <div class="slogan">
+      Découvrez vos statistiques Spotify en un clin d'œil !
+    </div>
+  </div>
+  <ion-button expand="block" class="login-btn" (click)="login()">
+    Se connecter avec Spotify
+  </ion-button>
 </ion-content>
