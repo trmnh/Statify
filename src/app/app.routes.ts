@@ -48,6 +48,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'analyze',
+        loadComponent: () =>
+          import('./pages/analyze/analyze.component').then(
+            (m) => m.AnalyzeComponent
+          ),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',

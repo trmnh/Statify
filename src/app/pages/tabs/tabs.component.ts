@@ -3,6 +3,8 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
+import { addIcons } from 'ionicons';
+import { analyticsOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -12,5 +14,9 @@ import { NgxEchartsModule } from 'ngx-echarts';
   styleUrls: ['./tabs.component.scss'],
 })
 export class TabsComponent {
-  constructor() {}
+  constructor() {
+    addIcons({
+      analyticsOutline,
+    });
+  }
 }

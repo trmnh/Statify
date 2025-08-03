@@ -222,9 +222,34 @@ ion-content {
   .preview-btn {
     width: 44px;
     height: 44px;
-    --border-radius: 50%;
-    ion-icon {
-      font-size: 1.6rem;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    .play-icon {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
     }
   }
   audio {
@@ -236,30 +261,93 @@ ion-content {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 24px;
-  margin-top: 18px;
+  gap: 32px;
+  margin-top: 20px;
 
   .action-btn-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 
-    ion-button {
-      width: 54px;
-      height: 54px;
-      --border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      ion-icon {
+    .action-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+
+      &.action-btn-danger {
+        background: #ff4757;
+
+        &:hover {
+          background: #ff3742;
+        }
+
+        &:active {
+          background: #ff2e3a;
+        }
+      }
+
+      &.action-btn-success {
+        background: #2ed573;
+
+        &:hover {
+          background: #26d0ce;
+        }
+
+        &:active {
+          background: #20bf6b;
+        }
+      }
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      .icon-text {
         font-size: 2rem;
+        font-weight: bold;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        padding: 0;
+        text-align: center;
       }
     }
+
     span {
-      font-size: 0.98rem;
-      font-weight: 500;
-      color: #222;
-      margin-top: 2px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin-top: 4px;
       user-select: none;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
   }
 }

@@ -1,0 +1,99 @@
+<div class="upload-container">
+  <!-- Zone de drop -->
+  <div
+    class="drop-zone"
+    [class.drag-over]="isDragOver"
+    [class.processing]="isProcessing"
+    [class.success]="uploadStatus === 'success'"
+    [class.error]="uploadStatus === 'error'"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="selectFile()"
+  >
+    <!-- État par défaut -->
+    @if (uploadStatus === 'idle') {
+    <div class="upload-content">
+      <ion-icon name="cloud-upload-outline" size="large"></ion-icon>
+      <h3>Glissez votre fichier ZIP ici</h3>
+      <p>ou cliquez pour sélectionner un fichier</p>
+      <ion-button fill="outline" size="small">
+        <ion-icon name="document-outline" slot="start"></ion-icon>
+        Choisir un fichier
+      </ion-button>
+    </div>
+    }
+
+    <!-- État de traitement -->
+    @if (uploadStatus === 'processing') {
+    <div class="upload-content">
+      <ion-spinner name="crescent"></ion-spinner>
+      <h3>Traitement en cours...</h3>
+      <p>Analyse du fichier ZIP</p>
+    </div>
+    }
+
+    <!-- État de succès -->
+    @if (uploadStatus === 'success') {
+    <div class="upload-content">
+      <ion-icon
+        name="checkmark-circle-outline"
+        size="large"
+        color="success"
+      ></ion-icon>
+      <h3>Fichier traité avec succès !</h3>
+      <p>{{ selectedFile?.name }}</p>
+      <ion-button fill="clear" size="small" (click)="resetUpload()">
+        <ion-icon name="close-outline" slot="start"></ion-icon>
+        Changer de fichier
+      </ion-button>
+    </div>
+    }
+
+    <!-- État d'erreur -->
+    @if (uploadStatus === 'error') {
+    <div class="upload-content">
+      <ion-icon
+        name="alert-circle-outline"
+        size="large"
+        color="danger"
+      ></ion-icon>
+      <h3>Erreur lors du traitement</h3>
+      <p>{{ errorMessage }}</p>
+      <ion-button fill="clear" size="small" (click)="resetUpload()">
+        <ion-icon name="close-outline" slot="start"></ion-icon>
+        Réessayer
+      </ion-button>
+    </div>
+    }
+  </div>
+
+  <!-- Informations d'aide -->
+  <div class="help-info">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Comment obtenir vos données Spotify ?
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ol>
+          <li>Connectez-vous à votre compte Spotify</li>
+          <li>
+            Allez dans <strong>Paramètres</strong> →
+            <strong>Confidentialité</strong>
+          </li>
+          <li>Cliquez sur <strong>"Demander mes données"</strong></li>
+          <li>Attendez l'email avec votre fichier ZIP</li>
+          <li>Uploadez le fichier <code>my_spotify_data.zip</code> ici</li>
+        </ol>
+        <p class="note">
+          <ion-icon name="warning-outline"></ion-icon>
+          <strong>Note :</strong> Le traitement peut prendre quelques minutes
+          selon la taille de vos données.
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</div>

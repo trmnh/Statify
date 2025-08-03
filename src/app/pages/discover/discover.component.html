@@ -34,46 +34,33 @@
           class="spotify-btn"
           (click)="playInApp(track)"
         >
-          <ion-icon slot="start" name="logo-spotify"></ion-icon>
           Jouer sur Spotify
         </ion-button>
         @if (track.preview_url) {
         <div class="audio-player">
-          <ion-button
-            fill="clear"
-            color="medium"
-            class="preview-btn"
-            (click)="togglePlay(audioPlayer)"
-          >
-            <ion-icon
-              [name]="isPlaying ? 'pause' : 'play'"
-              size="large"
-            ></ion-icon>
-          </ion-button>
+          <button class="preview-btn" (click)="togglePlay(audioPlayer)">
+            <span class="play-icon">{{ isPlaying ? "⏸" : "▶" }}</span>
+          </button>
           <audio #audioPlayer [src]="track.preview_url"></audio>
         </div>
         }
         <div class="action-buttons-tinder">
           <div class="action-btn-col">
-            <ion-button shape="round" color="danger" (click)="onSwipeLeft()">
-              <ion-icon name="close-outline" size="large"></ion-icon>
-            </ion-button>
+            <button
+              class="action-btn action-btn-danger"
+              (click)="onSwipeLeft()"
+            >
+              <span class="icon-text">✕</span>
+            </button>
             <span>Non</span>
           </div>
           <div class="action-btn-col">
-            <ion-button
-              shape="round"
-              color="warning"
-              (click)="onSuperlike(track)"
+            <button
+              class="action-btn action-btn-success"
+              (click)="onSwipeRight()"
             >
-              <ion-icon name="star-outline" size="large"></ion-icon>
-            </ion-button>
-            <span>Superlike</span>
-          </div>
-          <div class="action-btn-col">
-            <ion-button shape="round" color="success" (click)="onSwipeRight()">
-              <ion-icon name="heart-outline" size="large"></ion-icon>
-            </ion-button>
+              <span class="icon-text">♥</span>
+            </button>
             <span>Oui</span>
           </div>
         </div>

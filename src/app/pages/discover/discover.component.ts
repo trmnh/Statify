@@ -26,8 +26,6 @@ import {
 import { SpotifyPlayerService } from '../../services/player/spotify-player.service';
 import { PlayerComponent } from '../../components/player/player.component';
 import { SpotifyPlaylistService } from '../../services/playlist/spotify-playlist.service';
-import { addIcons } from 'ionicons';
-import { close, star, heart } from 'ionicons/icons';
 
 @Component({
   selector: 'app-discover',
@@ -53,8 +51,9 @@ export class DiscoverComponent implements OnInit {
 
   private likedTrackIds = new Set<string>();
   private dislikedTrackIds = new Set<string>();
-  private superlikePlaylistId: string | null = null;
-  private superlikePlaylistName = 'Discover Superlikes';
+  private discoverPlaylistId: string | null = null;
+  private discoverPlaylistName = 'Discover Spotify';
+  private readonly DISCOVER_PLAYLIST_KEY = 'statify_discover_playlist_id';
 
   isLoading = false;
   error: string | null = null;
@@ -64,43 +63,69 @@ export class DiscoverComponent implements OnInit {
   private currentTrackId: string | null = null;
 
   constructor() {
-    addIcons({
-      close: close,
-      star: star,
-      heart: heart,
-    });
+    // Pas besoin d'ajouter des icônes pour les symboles Unicode
   }
 
   ngOnInit() {
     this.loadInitialRecommendations();
-    this.initializeSuperlikePlaylist();
+    this.initializeDiscoverPlaylist();
   }
 
-  private async initializeSuperlikePlaylist() {
+  private async initializeDiscoverPlaylist() {
     try {
+      // D'abord, essayer de récupérer l'ID depuis le localStorage
+      const savedPlaylistId = localStorage.getItem(this.DISCOVER_PLAYLIST_KEY);
+
+      if (savedPlaylistId) {
+        // Vérifier si la playlist existe toujours
+        try {
+          const playlist = await firstValueFrom(
+            this.playlistService.getPlaylist(savedPlaylistId)
+          );
+          if (playlist) {
+            this.discoverPlaylistId = savedPlaylistId;
+            console.log(
+              'Playlist Discover récupérée depuis le cache:',
+              savedPlaylistId
+            );
+            return;
+          }
+        } catch (err) {
+          console.log(
+            "Playlist sauvegardée introuvable, recherche d'une nouvelle..."
+          );
+        }
+      }
+
+      // Si pas d'ID sauvegardé ou playlist introuvable, chercher dans les playlists existantes
       const playlists = await firstValueFrom(
         this.playlistService.getUserPlaylists(50)
       );
-      const superlike = playlists.find(
-        (p) => p.name === this.superlikePlaylistName
+
+      // Chercher une playlist avec le nom exact
+      let discover = playlists.find(
+        (p) => p.name === this.discoverPlaylistName
       );
 
-      if (superlike) {
-        this.superlikePlaylistId = superlike.id;
-        console.log('Playlist Superlike trouvée:', superlike.id);
+      if (discover) {
+        this.discoverPlaylistId = discover.id;
+        localStorage.setItem(this.DISCOVER_PLAYLIST_KEY, discover.id);
+        console.log('Playlist Discover trouvée:', discover.id);
       } else {
+        // Créer une nouvelle playlist seulement si aucune n'existe
         const newPlaylist = await firstValueFrom(
           this.playlistService.createPlaylist(
-            this.superlikePlaylistName,
-            'Morceaux superlikés depuis Discover'
+            this.discoverPlaylistName,
+            'Morceaux découverts et aimés via Statify'
           )
         );
-        this.superlikePlaylistId = newPlaylist.id;
-        console.log('Nouvelle playlist Superlike créée:', newPlaylist.id);
+        this.discoverPlaylistId = newPlaylist.id;
+        localStorage.setItem(this.DISCOVER_PLAYLIST_KEY, newPlaylist.id);
+        console.log('Nouvelle playlist Discover créée:', newPlaylist.id);
       }
     } catch (err) {
       console.error(
-        "Erreur lors de l'initialisation de la playlist Superlike:",
+        "Erreur lors de l'initialisation de la playlist Discover:",
         err
       );
     }
@@ -214,11 +239,43 @@ export class DiscoverComponent implements OnInit {
       const currentTrack = this.currentTrackSubject.value;
       if (currentTrack) {
         this.likedTrackIds.add(currentTrack.id);
+
+        // Liker la piste sur Spotify
         try {
           await firstValueFrom(this.userService.likeTrack(currentTrack.id));
+          console.log('Piste likée sur Spotify:', currentTrack.name);
         } catch (err) {
           console.warn('Impossible de liker la piste sur Spotify:', err);
-          // On continue même si le like échoue
+        }
+
+        // Ajouter à la playlist Discover Spotify
+        try {
+          // S'assurer qu'on a une playlist Discover
+          if (!this.discoverPlaylistId) {
+            await this.initializeDiscoverPlaylist();
+          }
+
+          if (this.discoverPlaylistId) {
+            await firstValueFrom(
+              this.playlistService.addTracksToPlaylist(
+                this.discoverPlaylistId,
+                [currentTrack.uri]
+              )
+            );
+            console.log(
+              'Piste ajoutée à la playlist Discover Spotify:',
+              currentTrack.name
+            );
+          } else {
+            console.warn(
+              "Impossible de récupérer l'ID de la playlist Discover"
+            );
+          }
+        } catch (err) {
+          console.warn(
+            "Impossible d'ajouter la piste à la playlist Discover Spotify:",
+            err
+          );
         }
       }
       this.nextTrack();
@@ -310,54 +367,5 @@ export class DiscoverComponent implements OnInit {
         // Optionnel : afficher une notification à l'utilisateur
       },
     });
-  }
-
-  async onSuperlike(track: SpotifyTrack) {
-    try {
-      // Ajouter aux likes Spotify
-      try {
-        await firstValueFrom(this.userService.likeTrack(track.id));
-      } catch (err) {
-        console.warn('Impossible de liker la piste sur Spotify:', err);
-      }
-
-      // S'assurer que nous avons une playlist Superlike
-      if (!this.superlikePlaylistId) {
-        await this.initializeSuperlikePlaylist();
-        if (!this.superlikePlaylistId) {
-          throw new Error(
-            'Impossible de créer ou trouver la playlist Superlike'
-          );
-        }
-      }
-
-      // Ajouter le morceau à la playlist Superlike
-      try {
-        await firstValueFrom(
-          this.playlistService.addTracksToPlaylist(this.superlikePlaylistId, [
-            track.uri,
-          ])
-        );
-        console.log('Piste ajoutée à la playlist Superlike:', track.name);
-      } catch (err) {
-        console.warn(
-          "Impossible d'ajouter la piste à la playlist Superlike:",
-          err
-        );
-      }
-
-      // Ajouter aux likes locaux
-      this.likedTrackIds.add(track.id);
-
-      // Passer à la piste suivante
-      if (this.currentAudio) {
-        this.currentAudio.pause();
-        this.isPlaying = false;
-      }
-      this.nextTrack();
-    } catch (err) {
-      console.error('Erreur lors du superlike:', err);
-      this.nextTrack();
-    }
   }
 }

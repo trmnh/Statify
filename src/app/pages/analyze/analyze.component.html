@@ -1,0 +1,148 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Analyse des données</ion-title>
+    @if (hasData$ | async) {
+    <ion-buttons slot="end">
+      <ion-button (click)="resetAnalysis()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Zone d'upload (visible si pas de données) -->
+  @if (!(hasData$ | async)) {
+  <app-upload-zip
+    (dataLoaded)="onFileUploaded($event)"
+    (error)="onUploadError($event)"
+  ></app-upload-zip>
+  }
+
+  <!-- Indicateur de chargement -->
+  @if (loading$ | async) {
+  <div class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Analyse des données en cours...</p>
+  </div>
+  }
+
+  <!-- Message d'erreur -->
+  @if (error$ | async; as error) {
+  <ion-card color="danger">
+    <ion-card-content>
+      <ion-icon name="alert-circle-outline" size="large"></ion-icon>
+      <h3>Erreur</h3>
+      <p>{{ error }}</p>
+      <ion-button fill="clear" (click)="resetAnalysis()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Réessayer
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+  }
+
+  <!-- Statistiques globales -->
+  @if ((hasData$ | async) && (stats$ | async); as stats) {
+  <div class="stats-grid">
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-content">
+          <ion-icon name="time-outline" color="primary"></ion-icon>
+          <div class="stat-info">
+            <h3>{{ stats.totalListeningHours | number : "1.0-1" }}h</h3>
+            <p>Temps total d'écoute</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-content">
+          <ion-icon name="musical-notes-outline" color="secondary"></ion-icon>
+          <div class="stat-info">
+            <h3>{{ stats.totalTracks | number }}</h3>
+            <p>Morceaux écoutés</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-content">
+          <ion-icon name="people-outline" color="tertiary"></ion-icon>
+          <div class="stat-info">
+            <h3>{{ stats.uniqueArtists | number }}</h3>
+            <p>Artistes uniques</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-content">
+          <ion-icon name="stats-chart-outline" color="quaternary"></ion-icon>
+          <div class="stat-info">
+            <h3>
+              {{ stats.averageTrackDuration / 1000 / 60 | number : "1.0-0" }}min
+            </h3>
+            <p>Durée moyenne</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Grille des graphiques -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-lg="6">
+        <app-top-artists-cards
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-top-artists-cards>
+      </ion-col>
+      <ion-col size="12" size-lg="6">
+        <app-top-tracks-cards
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-top-tracks-cards>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" size-lg="6">
+        <app-monthly-listening-chart
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-monthly-listening-chart>
+      </ion-col>
+      <ion-col size="12" size-lg="6">
+        <app-activity-chart
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-activity-chart>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12" size-lg="6">
+        <app-skipped-top-artists-chart
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-skipped-top-artists-chart>
+      </ion-col>
+      <ion-col size="12" size-lg="6">
+        <app-skipped-ratio-chart
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-skipped-ratio-chart>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="12">
+        <app-duration-chart
+          [entries]="(streamingEntries$ | async) || []"
+        ></app-duration-chart>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  }
+</ion-content>
